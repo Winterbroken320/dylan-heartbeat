@@ -561,12 +561,23 @@ app.post("/v1/chat/completions", async (req, reply) => {
       messages: summarizeMessagesForLog(body?.messages || [])
     }));
 
-    const kelivoMessages = body.messages || [];
+    const kelivoMessages = body.messages || [];// 自动补时间戳：Kelivo 不带时间时，用服务器当前时间补上，
+// 这样 enhanced_messages.json 里的 user 消息永远带时间，wake_up 就能识别。
+const autoTsPrefix = formatDateTimeInTimeZone(new Date(), TIME_ZONE);
+const timelineSource = kelivoMessages.map(msg => {
+  if (msg.role !== "user") return msg;
+  const text = normalizeContentToText(msg.content);
+  if (text && !extractTimestamp(text)) {
+    return { ...msg, content: `${autoTsPrefix} ${text}` };
+  }
+  return msg;
+});
+
     const oldTimeline = loadTimeline();
 
     const tsDB = loadTimestampDB();
     let tsDBDirty = false;
-    for (const msg of kelivoMessages) {
+    for (const msg of timelineSource) {
       if (msg.role === "system") continue;
       if (msg.role === "tool") continue;
       const ts = extractTimestamp(normalizeContentToText(msg.content));
@@ -578,7 +589,7 @@ app.post("/v1/chat/completions", async (req, reply) => {
     }
     if (tsDBDirty) saveTimestampDB(tsDB);
 
-    const finalTimeline = buildTimeline(kelivoMessages, tsDB);
+    const finalTimeline = buildTimeline(timelineSource, tsDB);
     saveTimeline(finalTimeline);
 
     // Kelivo 发图时 content 常是数组。默认原样透传给视觉模型；
