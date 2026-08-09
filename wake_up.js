@@ -90,7 +90,7 @@ async function sendPushNotification({ title, body }) {
       "Content-Type": "application/json"
     };
     if (process.env.NTFY_TOKEN) headers.Authorization = `Bearer ${process.env.NTFY_TOKEN}`;
-const payload = buildNtfyPayload({
+    const payload = buildNtfyPayload({
   topic,
   title,
   message: body,
