@@ -10,12 +10,11 @@ function normalizeNtfyPriority(rawValue) {
   return undefined;
 }
 
-function buildNtfyPayload({ topic, title, message, priority, tags }) {
+function buildNtfyPayload({ topic, title, message, priority, tags, icon }) {
   const payload = { topic, title, message };
-  const normalizedPriority = normalizeNtfyPriority(priority);
-  if (normalizedPriority !== undefined) payload.priority = normalizedPriority;
-  const normalizedTags = String(tags ?? "").split(",").map(tag => tag.trim()).filter(Boolean);
-  if (normalizedTags.length) payload.tags = normalizedTags;
+  if (priority) payload.priority = parseInt(priority);
+  if (tags) payload.tags = tags.split(',').map(t => t.trim());
++ if (icon) payload.icon = icon;
   return payload;
 }
 
