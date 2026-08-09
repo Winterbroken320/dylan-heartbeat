@@ -91,12 +91,13 @@ async function sendPushNotification({ title, body }) {
     };
     if (process.env.NTFY_TOKEN) headers.Authorization = `Bearer ${process.env.NTFY_TOKEN}`;
     const payload = buildNtfyPayload({
-      topic,
-      title,
-      message: body,
-      priority: process.env.NTFY_PRIORITY,
-      tags: process.env.NTFY_TAGS
-    });
+  topic,
+  title,
+  message: body,
+  priority: process.env.NTFY_PRIORITY,
+  tags: process.env.NTFY_TAGS,
++ icon: process.env.NTFY_ICON_URL
+});
 
     const response = await fetch(server, {
       method: "POST",
