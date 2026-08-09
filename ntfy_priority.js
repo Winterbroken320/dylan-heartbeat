@@ -14,7 +14,7 @@ function buildNtfyPayload({ topic, title, message, priority, tags, icon }) {
   const payload = { topic, title, message };
   if (priority) payload.priority = parseInt(priority);
   if (tags) payload.tags = tags.split(',').map(t => t.trim());
-+ if (icon) payload.icon = icon;
+  if (icon) payload.icon = icon;
   return payload;
 }
 
