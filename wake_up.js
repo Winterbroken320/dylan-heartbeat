@@ -433,6 +433,16 @@ async function runWakeUp() {
     })
     .join("\n\n");
 
+  const assistantMessages = cleanMessages
+  .filter(msg => msg.role === "assistant")
+  .slice(-10)
+  .map(msg => `[Kairos 之前说过] ${normalizeContentToText(msg.content)}`)
+  .join("\n\n");
+
+if (assistantMessages) {
+  historyText = historyText + "\n\n## 你最近发过的推送记录\n\n" + assistantMessages;
+}
+
   const baseSystemPrompt = cleanMessages.find(msg => msg.role === "system");
   const cleanSP = baseSystemPrompt 
     ? normalizeContentToText(baseSystemPrompt.content).split("## Memories")[0].trim()
